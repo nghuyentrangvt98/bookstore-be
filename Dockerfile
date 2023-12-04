@@ -5,5 +5,5 @@ COPY package.json package-lock.json nodemon.json tsconfig.json ./
 RUN npm install
 COPY src/ ./src/
 COPY assets/ ./assets/
-EXPOSE 8000
+EXPOSE 8080
 CMD [ "npm", "start"]
