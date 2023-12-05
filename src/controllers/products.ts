@@ -16,7 +16,7 @@ export const getAllProducts = async (
   res: express.Response
 ) => {
   try {
-    const filter = req.query.filter as string;
+    const filter = (req.query.filter as string) || "{}";
     const products = await getProducts(JSON.parse(filter));
     return res.status(200).json(products);
   } catch (error) {

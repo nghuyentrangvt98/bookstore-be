@@ -5,6 +5,8 @@ export const getAuthorById = (id: string) => AuthorModel.findById(id);
 export const getAuthorByIds = (ids: string[]) =>
   AuthorModel.find({ _id: { $in: ids } });
 
+export const getAuthors = (filter: any = {}) => AuthorModel.find(filter);
+
 export const createOneAuthor = (values: Record<string, any>) =>
   new AuthorModel(values).save().then((author: any) => author.toObject());
 
