@@ -12,7 +12,7 @@ var transporter = nodemailer.createTransport({
 const format_message = (user_name: string, download_string: string) => {
   return `Dear ${user_name},<br>
     <br>
-    We hope this email finds you in good spirits. We sincerely appreciate your recent purchase of the following eBooks from BookStore:
+    We hope this email finds you in good spirits. We sincerely appreciate your recent purchase of the following eBooks from BookStore:<br>
     <br>
     ${download_string}
     <br>

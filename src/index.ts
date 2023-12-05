@@ -9,9 +9,7 @@ import firebaseAccountCredentials from "../assets/serviceAccountCredentials.json
 
 import router from "./router";
 import mongoose from "mongoose";
-
-const MONGO_URL =
-  "mongodb+srv://paige:paige@cluster0.dm7y9e6.mongodb.net/?retryWrites=true&w=majority"; // DB URI
+import { MONGO_URL } from "./setting";
 
 mongoose.Promise = Promise;
 mongoose.connect(MONGO_URL);
