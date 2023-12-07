@@ -1,84 +1,79 @@
 import express from "express";
 
-import {
-  deleteUserById,
-  getUsers,
-  getUserById,
-  createOneUser,
-} from "../repo/users";
+import { userRepo } from "../repo";
 
 import Authentication from "../utils/authentication";
+import { UserRole } from "../schemas/enum";
+import { NotFound } from "../exc/others";
 
 export const getAllUsers = async (
   req: express.Request,
   res: express.Response
 ) => {
-  try {
-    const users = await getUsers();
-    const res_users = users.map((user) => {
-      delete user.hashed_password;
-      return user;
-    });
-    return res.status(200).json(res_users);
-  } catch (error) {
-    console.log(error);
-    return res.sendStatus(400);
-  }
+  const filter = (req.query.filter as string) || "{}";
+  const users = await userRepo.find(JSON.parse(filter));
+  const resUsers = users.map((user) => {
+    delete user.hashedPassword;
+    return user;
+  });
+  return res.json(resUsers);
 };
 
 export const deleteUser = async (
   req: express.Request,
   res: express.Response
 ) => {
-  try {
-    const { id } = req.params;
-
-    const deletedUser = await deleteUserById(id);
-
-    return res.json(deletedUser);
-  } catch (error) {
-    console.error(error.message);
-    res.status(400).json({ status: false, error: error.message });
-  }
+  const { id } = req.params;
+  const user = await userRepo.delete(id);
+  delete user.hashedPassword;
+  return res.json(user);
 };
 
 export const updateUser = async (
   req: express.Request,
   res: express.Response
 ) => {
-  try {
-    const { id } = req.params;
-    const { username } = req.body;
-
-    if (!username) {
-      return res.sendStatus(400);
-    }
-
-    const user = await getUserById(id);
-
-    user.username = username;
-    await user.save();
-    delete user.hashed_password;
-    return res.status(200).json(user).end();
-  } catch (error) {
-    console.error(error.message);
-    res.status(400).json({ status: false, error: error.message });
+  const { id } = req.params;
+  const user = await userRepo.findById(id);
+  if (!user) {
+    throw new NotFound("user", id);
   }
+  if (req.body.password) {
+    req.body.hashedPassword = await Authentication.hashPassword(
+      req.body.password
+    );
+  }
+  req.body.username = user.username;
+  await userRepo.update(id, req.body);
+  const userUpdated = await userRepo.findById(id);
+  delete userUpdated.hashedPassword;
+  return res.status(200).json(userUpdated).end();
+};
+
+export const updateMe = async (req: express.Request, res: express.Response) => {
+  if (req.body.password) {
+    req.body.hashedPassword = await Authentication.hashPassword(
+      req.body.password
+    );
+  }
+  await userRepo.update(req.body.user._id, req.body);
+  const userUpdated = await userRepo.findById(req.body.user._id);
+  delete userUpdated.hashedPassword;
+  return res.status(200).json(userUpdated).end();
 };
 
 export const createUser = async (
   req: express.Request,
   res: express.Response
 ) => {
-  try {
-    req.body.hashed_password = await Authentication.hashPassword(
-      req.body.password
-    );
-    const user = await createOneUser(req.body);
-    delete user.hashed_password;
-    return res.status(201).json(user).end();
-  } catch (error) {
-    console.error(error.message);
-    res.status(400).json({ status: false, error: error.message });
+  req.body.hashedPassword = await Authentication.hashPassword(
+    req.body.password
+  );
+  const currentUser = req.body.user;
+  if (!currentUser || currentUser.role != UserRole.ADMIN) {
+    req.body.role = UserRole.USER;
   }
+  const user = await userRepo.create(req.body);
+  delete user.hashedPassword;
+  return res.status(201).json(user).end();
 };

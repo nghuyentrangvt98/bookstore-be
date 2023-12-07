@@ -1,17 +1,19 @@
-import { CartModel } from "../schemas/carts";
+import { ICart, CartModel } from "../schemas/carts";
+import { RepositoryBaseWithPopulate } from "./base";
 
-export const getCarts = (filter: any = {}) =>
-  CartModel.find({ ...filter, order_id: null });
-export const getCartsWithFilter = (filter: any) => CartModel.find(filter);
-
-export const createCart = (values: Record<string, any>) =>
-  new CartModel(values).save().then((cart: any) => cart.toObject());
-
-export const deleteCartById = (id: string) =>
-  CartModel.findOneAndDelete({ _id: id });
-
-export const updateCartByIds = (ids: string[], values: Record<string, any>) =>
-  CartModel.updateMany({ _id: { $in: ids } }, { $set: values });
-
-export const getCartsByIds = (ids: string[]) =>
-  CartModel.find({ _id: { $in: ids } });
+export class CartRepository extends RepositoryBaseWithPopulate<ICart> {
+  constructor() {
+    super(CartModel, ["product"]);
+  }
+  async updateByIds(
+    ids: string[],
+    values: Record<string, any>
+  ): Promise<boolean> {
+    let p = await CartModel.updateMany({ _id: { $in: ids } }, { $set: values });
+    return p.modifiedCount > 0;
+  }
+  async deleteByUser(_id: string, userId: string): Promise<ICart> {
+    let p = await CartModel.findOneAndDelete({ _id, userId });
+    return p.toObject();
+  }
+}

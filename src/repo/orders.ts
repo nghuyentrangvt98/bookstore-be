@@ -1,6 +1,8 @@
-import { OrderModel } from "../schemas/orders";
+import { OrderModel, IOrder } from "../schemas/orders";
+import { RepositoryBase } from "./base";
 
-export const getOrders = (filter: any = {}) => OrderModel.find(filter);
-
-export const createOrder = (values: Record<string, any>) =>
-  new OrderModel(values).save().then((order: any) => order.toObject());
+export class OrderRepository extends RepositoryBase<IOrder> {
+  constructor() {
+    super(OrderModel);
+  }
+}

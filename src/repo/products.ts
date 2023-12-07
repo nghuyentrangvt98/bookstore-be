@@ -1,20 +1,19 @@
-import mongoose from "mongoose";
-import { ProductModel } from "../schemas/products";
+import { IProduct, ProductModel } from "../schemas/products";
+import { RepositoryBaseWithPopulate } from "./base";
 
-export const getProducts = (filter: any = {}) =>
-  ProductModel.find(filter).populate("file");
-
-export const getProductById = (id: String) =>
-  ProductModel.findById(id).populate("file");
-
-export const getProductByIds = (ids: String[]) =>
-  ProductModel.find({ _id: { $in: ids } }).populate("file");
-
-export const createProducts = (values: Record<string, any>[]) => {
-  values.forEach((value) => {
-    new ProductModel(value).save().then((product: any) => product.toObject());
-  });
-};
-
-export const createOneProduct = (values: Record<string, any>) =>
-  new ProductModel(values).save().then((product: any) => product.toObject());
+export class ProductRepository extends RepositoryBaseWithPopulate<IProduct> {
+  constructor() {
+    super(ProductModel, ["file"]);
+  }
+  async createMany(items: Record<string, any>[]): Promise<IProduct[]> {
+    let list: IProduct[] = [];
+    await Promise.all(
+      items.map(async (item) => {
+        let p = new ProductModel(item);
+        await p.save();
+        list.push(p.toObject());
+      })
+    );
+    return list;
+  }
+}

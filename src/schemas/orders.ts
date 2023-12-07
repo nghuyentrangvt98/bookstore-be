@@ -1,7 +1,13 @@
 import mongoose from "mongoose";
 
-export const OrderSchema = new mongoose.Schema({
-  user_id: { type: String, required: false, default: null },
+export interface IOrder extends mongoose.Document {
+  userId: string;
+  payment: string;
+  total: number;
+}
+
+export const OrderSchema = new mongoose.Schema<IOrder>({
+  userId: { type: String, required: false, default: null },
   payment: { type: String, required: true },
   total: { type: Number, required: true },
 });

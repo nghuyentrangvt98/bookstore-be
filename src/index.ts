@@ -10,6 +10,7 @@ import firebaseAccountCredentials from "../assets/serviceAccountCredentials.json
 import router from "./router";
 import mongoose from "mongoose";
 import { MONGO_URL } from "./setting";
+import { CommonException } from "./exc/base";
 
 mongoose.Promise = Promise;
 mongoose.connect(MONGO_URL);
@@ -45,3 +46,10 @@ app.get("/", (req: express.Request, res: express.Response) => {
 });
 
 app.use("/", router());
+// @ts-expect-error
+app.use((err, req, res, next) => {
+  if (err instanceof CommonException)
+    return res.status(err.status).json({ error: err.message });
+  console.error(err.stack);
+  return res.status(400).json({ status: false, error: err.message });
+});

@@ -1,11 +1,19 @@
 import mongoose from "mongoose";
 import { UserRole } from "./enum";
 
-export const UserSchema = new mongoose.Schema({
+export interface IUser extends mongoose.Document {
+  username: string;
+  email: string;
+  hashedPassword: string;
+  displayName: string;
+  role: UserRole;
+}
+
+export const UserSchema = new mongoose.Schema<IUser>({
   email: { type: String, required: true },
   username: { type: String, required: true, unique: true },
-  hashed_password: { type: String, required: true },
-  display_name: { type: String, required: true },
+  hashedPassword: { type: String, required: true },
+  displayName: { type: String, required: true },
   role: { type: String, enum: UserRole, default: UserRole.USER },
 });
 

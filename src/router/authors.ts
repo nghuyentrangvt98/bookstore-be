@@ -5,10 +5,12 @@ import {
   createAuthor,
   getAllAuthors,
 } from "../controllers/authors";
+import { catchErrors } from "../middleware/exceptionHandler";
+import { authorizeAdmin, authorizeGuess } from "../middleware/authentication";
 // import { auth } from "../middleware/authentication";
 
 export default (router: express.Router) => {
-  router.get("/authors", getAllAuthors);
-  router.get("/authors/:id", getOneAuthor);
-  router.post("/authors", createAuthor);
+  router.get("/authors", authorizeGuess, catchErrors(getAllAuthors));
+  router.get("/authors/:id", authorizeGuess, catchErrors(getOneAuthor));
+  router.post("/authors", authorizeAdmin, catchErrors(createAuthor));
 };

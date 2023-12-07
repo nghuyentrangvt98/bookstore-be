@@ -1,6 +1,8 @@
-import { WishlistModel } from "../schemas/wishlist";
+import { IWishlist, WishlistModel } from "../schemas/wishlist";
+import { RepositoryBaseWithPopulate } from "./base";
 
-export const getWishlist = (filter: any = {}) => WishlistModel.find(filter);
-
-export const createOneWish = (values: Record<string, any>) =>
-  new WishlistModel(values).save().then((wish: any) => wish.toObject());
+export class WishlistRepository extends RepositoryBaseWithPopulate<IWishlist> {
+  constructor() {
+    super(WishlistModel, ["product"]);
+  }
+}

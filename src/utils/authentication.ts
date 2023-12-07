@@ -1,14 +1,14 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { secretKey } from "../setting";
+import { saltRounds, secretKey } from "../setting";
 
 interface Payload {
-  userId: number;
+  userId: string;
 }
 
 class Authentication {
   public static hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, 10);
+    return bcrypt.hash(password, +saltRounds);
   }
 
   public static async verifyPassword(
@@ -18,7 +18,7 @@ class Authentication {
     return await bcrypt.compare(text, encryptedText);
   }
 
-  public static generateToken(id: number): string {
+  public static generateToken(id: string): string {
     const payload: Payload = {
       userId: id,
     };

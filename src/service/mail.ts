@@ -1,20 +1,20 @@
 import nodemailer from "nodemailer";
-import { mail_password, mail_username } from "../setting";
+import { mailPassword, mailUsername } from "../setting";
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: mail_username,
-    pass: mail_password,
+    user: mailUsername,
+    pass: mailPassword,
   },
 });
 
-const format_message = (user_name: string, download_string: string) => {
-  return `Dear ${user_name},<br>
+const formatMessage = (username: string, downloadString: string) => {
+  return `Dear ${username},<br>
     <br>
     We hope this email finds you in good spirits. We sincerely appreciate your recent purchase of the following eBooks from BookStore:<br>
     <br>
-    ${download_string}
+    ${downloadString}
     <br>
     We're delighted to provide you with immediate access to your purchased content. However, please note that for security reasons, these download links will only remain active for the next 60 minutes.<br>
     <br>
@@ -28,16 +28,16 @@ const format_message = (user_name: string, download_string: string) => {
     `;
 };
 
-export const send_mail = (
+export const sendMail = (
   to: string,
-  user_name: string,
-  download_string: string
+  username: string,
+  downloadString: string
 ) => {
   var mailOptions = {
     from: "BookStore <paige.21522917@gmail.com>",
     to: to,
     subject: "Sending Download URL",
-    html: format_message(user_name, download_string),
+    html: formatMessage(username, downloadString),
   };
 
   transporter.sendMail(mailOptions, function (error, info) {

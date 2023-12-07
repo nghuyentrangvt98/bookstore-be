@@ -1,10 +1,18 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
+import { IProduct } from "./products";
 
-export const CartSchema = new mongoose.Schema({
-  user_id: { type: String, required: false, default: null },
-  product_id: { type: String, required: true },
-  order_id: { type: String, required: false, default: null },
-  session_id: { type: String, required: false, default: null },
+export interface ICart extends mongoose.Document {
+  userId: string;
+  orderId: string;
+  sessionId: string;
+  product: IProduct;
+}
+
+export const CartSchema = new mongoose.Schema<ICart>({
+  userId: { type: String, required: false, default: null },
+  product: { type: Schema.ObjectId, ref: "Product", require: true },
+  orderId: { type: String, required: false, default: null },
+  sessionId: { type: String, required: false, default: null },
 });
 
 export const CartModel = mongoose.model("Cart", CartSchema);

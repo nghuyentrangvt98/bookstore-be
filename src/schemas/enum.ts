@@ -5,6 +5,12 @@ export enum UserRole {
   USER = "user",
 }
 
+export enum UserRoleWithGuess {
+  ADMIN = "admin",
+  USER = "user",
+  GUESS = "guess",
+}
+
 export enum Category {
   Fiction = "Fiction",
   NoneFiction = "Non-Fiction",

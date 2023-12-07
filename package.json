@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prestart": "ts-node ./src/prestart.ts",
     "start": "nodemon",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"

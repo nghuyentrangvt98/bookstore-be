@@ -1,43 +1,33 @@
 import express from "express";
 
-import { getAuthorById, createOneAuthor, getAuthors } from "../repo/authors";
+import { authorRepo } from "../repo";
+import { NotFound } from "../exc/others";
 
 export const getAllAuthors = async (
   req: express.Request,
   res: express.Response
 ) => {
-  try {
-    const authors = await getAuthors();
-    return res.status(200).json(authors);
-  } catch (error) {
-    console.log(error);
-    return res.sendStatus(400);
-  }
+  const filter = (req.query.filter as string) || "{}";
+  const authors = await authorRepo.find(JSON.parse(filter));
+  return res.status(200).json(authors);
 };
 
 export const getOneAuthor = async (
   req: express.Request,
   res: express.Response
 ) => {
-  try {
-    const { id } = req.params;
-    const author = await getAuthorById(id);
-    return res.status(200).json(author);
-  } catch (error) {
-    console.log(error);
-    return res.sendStatus(400);
+  const { id } = req.params;
+  const author = await authorRepo.findById(id);
+  if (!author) {
+    throw new NotFound("author", id);
   }
+  return res.status(200).json(author);
 };
 
 export const createAuthor = async (
   req: express.Request,
   res: express.Response
 ) => {
-  try {
-    const author = await createOneAuthor(req.body);
-    return res.status(201).json(author).end();
-  } catch (error) {
-    console.error(error.message);
-    res.status(400).json({ status: false, error: error.message });
-  }
+  const author = await authorRepo.create(req.body);
+  return res.status(201).json(author).end();
 };

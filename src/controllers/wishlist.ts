@@ -1,13 +1,12 @@
 import express from "express";
-
-import { getWishlist, createOneWish } from "../repo/wishlist";
+import { wishlistRepo } from "../repo";
 
 export const getAllWish = async (
   req: express.Request,
   res: express.Response
 ) => {
   try {
-    const wishes = await getWishlist({ user_id: req.body.user._id });
+    const wishes = await wishlistRepo.find({ userId: req.body.user._id });
     return res.status(200).json(wishes);
   } catch (error) {
     console.log(error);
@@ -20,8 +19,15 @@ export const createWish = async (
   res: express.Response
 ) => {
   try {
-    req.body.user_id = req.body.user.id;
-    const wish = await createOneWish(req.body);
+    req.body.userId = req.body.user._id;
+    const wishes = await wishlistRepo.find({
+      userId: req.body.user._id,
+      product: req.body.product,
+    });
+    if (wishes.length > 0) {
+      throw new Error("product already been add to wishlist");
+    }
+    const wish = await wishlistRepo.create(req.body);
     return res.status(201).json(wish).end();
   } catch (error) {
     console.error(error.message);
