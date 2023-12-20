@@ -5,6 +5,7 @@ import { userRepo } from "../repo";
 import Authentication from "../utils/authentication";
 import { UserRole } from "../schemas/enum";
 import { NotFound } from "../exc/others";
+import { PasswordNotMatch } from "../exc/auth";
 
 export const getAllUsers = async (
   req: express.Request,
@@ -51,11 +52,19 @@ export const updateUser = async (
 };
 
 export const updateMe = async (req: express.Request, res: express.Response) => {
-  if (req.body.password) {
-    req.body.hashedPassword = await Authentication.hashPassword(
-      req.body.password
-    );
+  const { currentPassword, newPassword } = req.body;
+  if (currentPassword && newPassword) {
+    if (
+      !(await Authentication.verifyPassword(
+        currentPassword,
+        req.body.user.hashedPassword
+      ))
+    ) {
+      throw new PasswordNotMatch();
+    }
+    req.body.hashedPassword = await Authentication.hashPassword(newPassword);
   }
+
   await userRepo.update(req.body.user._id, req.body);
   const userUpdated = await userRepo.findById(req.body.user._id);
   delete userUpdated.hashedPassword;

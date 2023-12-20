@@ -24,3 +24,9 @@ export class NoPermission extends CommonException {
     super("not enough permission to perform this action.", 403);
   }
 }
+
+export class PasswordNotMatch extends CommonException {
+  constructor() {
+    super("wrong password", 400);
+  }
+}
