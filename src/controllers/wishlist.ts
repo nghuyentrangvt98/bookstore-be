@@ -34,3 +34,12 @@ export const createWish = async (
     res.status(400).json({ status: false, error: error.message });
   }
 };
+
+export const removeWish = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  const { id } = req.params;
+  const wish = await wishlistRepo.deleteByUser(id, req.body.user._id);
+  return res.status(201).json(wish).end();
+};
