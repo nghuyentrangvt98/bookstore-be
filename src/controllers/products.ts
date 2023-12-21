@@ -14,6 +14,18 @@ export const getAllProducts = async (
   return res.status(200).json(products);
 };
 
+export const getBuyedProducts = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  const carts = await cartRepo.find({
+    orderId: { $ne: null },
+    userId: req.body.user._id,
+  });
+  const product = carts.map((cart) => cart.product);
+  return res.status(200).json(product);
+};
+
 export const getOneProduct = async (
   req: express.Request,
   res: express.Response
